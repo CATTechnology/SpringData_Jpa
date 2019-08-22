@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Jpa_Hibernate.iml" filepath="$PROJECT_DIR$/Jpa_Hibernate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SpringDataJpa/SpringDataJpa.iml" filepath="$PROJECT_DIR$/../SpringDataJpa/SpringDataJpa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SpringDataJpa_OneToMany/SpringDataJpa_OneToMany.iml" filepath="$PROJECT_DIR$/../SpringDataJpa_OneToMany/SpringDataJpa_OneToMany.iml" />
+    </modules>
+  </component>
+</project>

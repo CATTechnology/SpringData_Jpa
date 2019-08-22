@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/data/jpa
+        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="top.takefly.Jpa"></context:component-scan>
+
+    <context:property-placeholder location="classpath:properties/mysql.properties"></context:property-placeholder>
+
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="jdbcUrl" value="${mysql.jdbcUlr}" />
+        <property name="driverClassName" value="${mysql.driverClass}" />
+        <property name="username" value="${mysql.password}" />
+        <property name="password" value="${mysql.password}" />
+     </bean>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!--包扫描-->
+        <property name="packagesToScan" value="top.takefly.Jpa.dao" />
+        <!--配置实际提供者-->
+        <property name="persistenceProvider">
+            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
+        </property>
+        <!--配置jpa适配器-->
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="showSql" value="true" />
+                <property name="generateDdl" value="true" />
+                <property name="database" value="MYSQL" />
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+            </bean>
+        </property>
+        <!--配置jpa-->
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"></bean>
+        </property>
+        <!--配置properties-->
+        <property name="jpaProperties">
+            <props>
+                <prop key="format_sql">true</prop>
+                <prop key="show_sql">true</prop>
+                <prop key="hibernate.hbm2.ddl">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <jpa:repositories base-package="top.takefly.Jpa"
+                      entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager"/>
+</beans>

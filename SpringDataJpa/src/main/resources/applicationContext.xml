@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/data/jpa
+		http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <context:component-scan base-package="top.takefly.Jpa"></context:component-scan>
+
+    <context:property-placeholder location="classpath:properties/*.properties"></context:property-placeholder>
+
+    <!--配置数据库库-->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="driverClassName" value="${mysql.driverClass}" />
+        <property name="jdbcUrl" value="${mysql.jdbcUlr}"/>
+        <property name="password" value="${mysql.password}"/>
+        <property name="username" value="${mysql.username}"/>
+    </bean>
+
+    <!--配置entityManagerFactory工厂-->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="packagesToScan" value="top.takefly.Jpa.pojo"></property>
+        <!--持久化提供者-->
+        <property name="persistenceProvider">
+            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
+        </property>
+        <!--jpa适配器-->
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="database" value="MYSQL"></property>
+                <property name="showSql" value="true"></property>
+                <property name="generateDdl" value="false"></property>
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"></property>
+            </bean>
+        </property>
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+        </property>
+        <!--jpa-->
+        <property name="jpaProperties">
+            <props>
+                <prop key="show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--配置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!--整合spring data jpa-->
+    <jpa:repositories base-package="top.takefly.Jpa.dao" transaction-manager-ref="transactionManager"
+                      entity-manager-factory-ref="entityManagerFactory" />
+
+    <!--配置事务aop事务-->
+    <!--配置txAdvice-->
+    <!--<tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="get*" read-only="true" />
+            <tx:method name="find*" read-only="true" />
+            <tx:method name="*" propagation="REQUIRED" />
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="myPoint" expression="execution(* top.takefly.Jpa.service.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="myPoint" />
+    </aop:config>-->
+
+    <aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="false"></aop:aspectj-autoproxy>
+
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"></tx:annotation-driven>
+
+</beans>
